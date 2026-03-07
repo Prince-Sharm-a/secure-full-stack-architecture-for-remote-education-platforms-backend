@@ -1,23 +1,61 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
+    
+    Route::middleware([])->prefix('/auth')->group(function (){
 
-Route::post('/login',[UserController::class,'login'])->name('login');
-Route::post('/register',[UserController::class,'register'])->name('register');
+        Route::post('/login',[AuthController::class,'login'])->name('login');
+        Route::post('/register',[AuthController::class,'register'])->name('register');
+        
+        Route::middleware('auth:sanctum')->group(function () {
+            
+            Route::get('/profile', function (Request $request) {
+                $user = auth()->user();
+                // return $request->user();
+                return $user->only('name','dob','gender','role','email','password','phone','profile_image');
+            });
+                
+            Route::get('/logout',[AuthController::class,'logout']);
+                
+        });
 
-Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/forgot-password',[AuthController::class,'forgotPassword']);
+        Route::post('/reset-password',[AuthController::class,'resetPassword']);
 
-    Route::get('/profile', function (Request $request) {
-        $user = auth()->user();
-        return $request->user();
+        // Todo :
+        Route::get('/email-verify/{token}',[AuthController::class,'emailVerify']);
+        Route::post('/resend-verification',[AuthController::class,'resendVerification']);
+
+        // Todo :
+        Route::prefix('/2fa')->group(function (){
+            Route::post('/enable',[AuthController::class,'twoFaEnable']);
+            Route::post('/verify',[AuthController::class,'twoFaVerify']);
+            Route::post('/disable',[AuthController::class,'twoFaDisable']);
+        });
+
     });
 
-    Route::get('/logout',[UserController::class,'logout']);
+    Route::middleware([])->prefix('/user')->group(function (){
+        // Todo
+        Route::get('/profile',[UserController::class,'getProfile']);
+        Route::put('/profile',[UserController::class,'profileUpdate']);
+        Route::put('/change-password',[UserController::class,'changePassword']);
+        Route::get('/active-devices',[UserController::class,'activeDevices']);
+        Route::delete('/logout-devices/{id}',[UserController::class,'logoutDevices']);
+        Route::delete('/delete-account',[UserController::class,'deleteAccount']);
+    });
 
+    Route::middleware([])->prefix('/courses')->group(function (){
+        // Todo
+        Route::get('',[CoursesController::class,'getCourses']);
+        Route::get('/{id}',[CoursesController::class,'getCoursesById']);
+        Route::get('/search',[CoursesController::class,'searchCourses']);
+        Route::get('/category/{slug}',[CoursesController::class,'getCoursesByCategory']);
+    });
 });
