@@ -15,11 +15,11 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         
         Route::middleware('auth:sanctum')->group(function () {
             
-            Route::get('/profile', function (Request $request) {
-                $user = auth()->user();
-                // return $request->user();
-                return $user->only('name','dob','gender','role','email','password','phone','profile_image');
-            });
+            // Route::get('/profile', function (Request $request) {
+            //     $user = auth()->user();
+            //     // return $request->user();
+            //     return $user->only('name','dob','gender','role','email','password','phone','profile_image');
+            // });
                 
             Route::get('/logout',[AuthController::class,'logout']);
                 
@@ -32,7 +32,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         Route::get('/email-verify/{token}',[AuthController::class,'emailVerify']);
         Route::post('/resend-verification',[AuthController::class,'resendVerification']);
 
-        // Todo :
+        //
         Route::prefix('/2fa')->group(function (){
             Route::post('/enable',[AuthController::class,'twoFaEnable']);
             Route::post('/verify',[AuthController::class,'twoFaVerify']);
@@ -41,8 +41,8 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
 
     });
 
-    Route::middleware([])->prefix('/user')->group(function (){
-        // Todo
+    Route::middleware(['auth:sanctum'])->prefix('/user')->group(function (){
+        //
         Route::get('/profile',[UserController::class,'getProfile']);
         Route::put('/profile',[UserController::class,'profileUpdate']);
         Route::put('/change-password',[UserController::class,'changePassword']);
@@ -57,5 +57,15 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         Route::get('/{id}',[CoursesController::class,'getCoursesById']);
         Route::get('/search',[CoursesController::class,'searchCourses']);
         Route::get('/category/{slug}',[CoursesController::class,'getCoursesByCategory']);
+    });
+
+    Route::middleware([])->prefix('/teacher')->group(function (){
+        // todo
+        Route::middleware([])->prefix('/courses')->group(function (){
+            Route::post('',[CoursesController::class,'createCourseTeacher']);
+            Route::put('/{id}',[CoursesController::class,'updateCourseTeacher']);
+            Route::delete('/{id}',[CoursesController::class,'deleteCourseTeacher']);
+            Route::get('',[CoursesController::class,'getCoursesTeacher']);
+        });
     });
 });

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\PasswordResetToken;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
@@ -37,6 +39,38 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'Your Account is '.$user->status
                 ],422);
+            }
+
+            if($user->two_factor_enable){
+               $otp = rand(100000,999999);
+
+               $user->otp = $otp;
+               $user->otp_expires_at = now()->addMinutes(2);
+               $user->save();
+
+               $emailMessage = "
+                \nHello,\n
+                \tYour OTP for 2-step Verification is $otp.\n                
+                \tIt is only valid for 2 minutes.\n
+                \tUse this OTP to complete your 2-step Verification.\n
+                \tDo not share this otp with anyone.\n\n
+                
+                Thanks and Regards\n
+                EDDUCATOR\n
+                ";
+                $feature = new FeatureController();
+                $feature->sendTextMail($request->email,'Two Factor Authentication',$emailMessage);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP sent to mail',
+                    '2fa_required' => true,
+                ],206);
+            }
+
+            $loginCount = DB::table('personal_access_tokens')->where('tokenable_id','=',$user->id)->count();
+            if($loginCount > 2){
+                return response()->json(['success'=>false,'message'=>'Already Logged in 2 Devices','device_logout'=>true]);
             }
 
             $token = $user->createToken('api-token')->plainTextToken;
@@ -147,23 +181,27 @@ class AuthController extends Controller
 
             $user = User::where('email','=',$request->email)->first();
             if(!$user){
-                return response()->json(['success'=>false,'message'=>'User Not Found with this email'],404);
+                return response()->json(['success'=>false,'message'=>'User Not Found'],404);
             }
 
             $token = Password::createToken($user);
             $resetLink = url(env('PASSWORD_RESET_LINK').'/reset-password'."?token=$token&email=$user->email");
 
             $emailMessage = "
-            Hello,\n
-            \tYour requested Password Link is here.\n\n\n
+            \nHello,\n
+            \tYour Link to Reset Password is here.\n
+            \tIt is only valid for 10 minutes.\n
+            \tVisit this URL to change your Password.\n\n
 
-            
             \tClick the link given below to reset your Password.\n\n
 
-            \t\t$resetLink
+            \t\t$resetLink\n\n
+            
+            Thanks and Regards\n
+            EDDUCATOR\n
             ";
             $feature = new FeatureController();
-            $feature->sendTextMail($user->email,'Email Verification',$emailMessage);
+            $feature->sendTextMail($request->email,'Reset Password',$emailMessage);
             
             return response()->json(['success'=>true,'message'=>'Check Your Mail'],201);
         } catch (\Exception $e){
@@ -187,14 +225,31 @@ class AuthController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
             
-            $record = PasswordResetToken::where('email','=',$request->token)->first();
+            $record = PasswordResetToken::where('email','=',$request->email)->first();
+            if(!$record){
+                return response()->json([
+                    'success'=>false,
+                    'message'=>'Invalid reset request'
+                ],404);
+            }
+            
+            if(Carbon::parse($record->created_at)->addMinutes(10)->isPast()){
+                return response()->json([
+                    'success'=>false,
+                    'message'=>'Token expired'
+                ],422);
+            }
 
             if(!Hash::check($request->token, $record->token)){
-                return response()->json(['success'=>false,'message'=>'Your Link is Expired or Not Valid'],422);
+                return response()->json(['success'=>false,'message'=>'Invalid Token'],422);
             }
 
             $user = User::where('email','=',$request->email)->first();
-            $user->update($request->only('password'));
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+            
+            $record->delete();
 
             return response()->json([
                 'success' => true,
@@ -210,7 +265,7 @@ class AuthController extends Controller
         }
     }
 
-    public function emailVerify($token){
+    public function emailVerify(Request $request, $token){
         try{
 
         } catch(\Exception $e){
@@ -236,7 +291,15 @@ class AuthController extends Controller
 
     public function twoFaEnable(Request $request){
         try{
+            $user = $request->user();
+            $user->update([
+                'two_factor_enable' => true
+            ]);
 
+            return response()->json([
+                'success' => true,
+                'message' => '2 - Factor Authentication Enabled',
+            ],204);
         } catch(\Exception $e){
             return response()->json([
                 'success' => false,
@@ -248,6 +311,41 @@ class AuthController extends Controller
 
     public function twoFaVerify(Request $request){
         try{
+            $rules = [
+                'email' => 'required | email',
+                'otp' => 'required | min:6 | max:6'
+            ];
+            $validation = \Validator::make($request->all(),$rules);
+            if($validation->fails()){
+                return response()->json(['success'=>false,'message'=>$validation->errors()],400);
+            }
+
+            $user = User::where('email','=',$request->email)->first();
+
+            if($user->otp !== $request->otp || $user->otp_expires_at < now()){
+                return response()->json(['success'=>false,'message'=>'Invalid or expired OTP'],400);
+            }
+
+            $loginCount = DB::table('personal_access_tokens')->where('tokenable_id','=',$user->id)->count();
+            if($loginCount > 2){
+                return response()->json(['success'=>false,'message'=>'Already Logged in 2 Devices','device_logout'=>true]);
+            }
+
+            $user->update([
+                'otp' => null,
+                'otp_expires_at' => null
+            ]);
+
+            $token = $user->createToken('api-token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => '2FA verified',
+                'data' => [
+                    'token' => $token,
+                    'user' => $user->only('id','name','dob','gender','role','email','phone','profile_image')
+                ]
+            ]);
 
         } catch(\Exception $e){
             return response()->json([
@@ -259,6 +357,20 @@ class AuthController extends Controller
     }
     public function twoFaDisable(Request $request){
         try{
+            $user = $request->user();
+
+            // todo: perform 2FA verification before disable 2FA
+
+            $user->update([
+                'two_factor_enable' => false,
+                'otp' => null,
+                'otp_expires_at' => null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Two Factor Authentication Disabled'
+            ],204);
 
         } catch(\Exception $e){
             return response()->json([
