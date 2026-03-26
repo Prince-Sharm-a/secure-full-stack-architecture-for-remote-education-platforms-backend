@@ -26,7 +26,7 @@ class CoursesController extends Controller
             ])
             ->paginate(env('PAGINATE',10));
             if(empty($data->data)){
-                return response()->json(['success' => false, 'message' => 'Not Found'],404);
+                return response()->json(['success' => false, 'message' => 'No Data'],404);
             }
 
             return response()->json([
@@ -126,6 +126,14 @@ class CoursesController extends Controller
 
     public function createCourseTeacher(Request $request){
         try{
+            $rules = [
+                'title' => 'required | max:255 | string',
+                'description' => 'nullable | string',
+                'price' => 'required | numeric | min:0',
+                'level' => 'required | string',
+                'status' => 'required | string',
+                'category' => 'required | string'
+            ];
             
         } catch(\Exception $e){
             return response()->json([
