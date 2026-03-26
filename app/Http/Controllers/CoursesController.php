@@ -139,7 +139,7 @@ class CoursesController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
             
-            $data = Course::create()
+            $data = Course::create();
             
         } catch(\Exception $e){
             return response()->json([
