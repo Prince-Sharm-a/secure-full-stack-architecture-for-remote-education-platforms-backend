@@ -134,6 +134,12 @@ class CoursesController extends Controller
                 'status' => 'required | string',
                 'category' => 'required | string'
             ];
+            $validation = \Validator::make($request->all(),$rules);
+            if($validation->fails()){
+                return response()->json(['success'=>false,'message'=>$validation->errors()],400);
+            }
+            
+            $data = Course::create()
             
         } catch(\Exception $e){
             return response()->json([
