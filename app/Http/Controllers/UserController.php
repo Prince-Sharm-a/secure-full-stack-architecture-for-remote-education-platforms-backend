@@ -132,8 +132,14 @@ class UserController extends Controller
             $rules = [
                 'password' => 'required | min:8'
             ];
-            $user = User::findOrFail($request->user()->id);
-            if(!Hash::check())
+            $validation = \Validator::make($request->all(),$rules);
+            if($validation->fails()){
+                return response()->json(['success'=>false,'message'=>$validation->errors()],400);
+            }
+            $user = $request->user();
+            if(!Hash::check($request->password,$user->password)){
+                return response()->json(['success'=>false,'message'=>'Invalid Password'],401);
+            }
             $user->delete();
 
             return response()->json([

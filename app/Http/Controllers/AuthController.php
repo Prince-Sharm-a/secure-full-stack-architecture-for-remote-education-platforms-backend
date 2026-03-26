@@ -65,7 +65,7 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'OTP sent to mail',
                     '2fa_required' => true,
-                ],206);
+                ]);
             }
 
             $loginCount = DB::table('personal_access_tokens')->where('tokenable_id','=',$user->id)->count();
@@ -299,7 +299,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => '2 - Factor Authentication Enabled',
-            ],204);
+            ]);
         } catch(\Exception $e){
             return response()->json([
                 'success' => false,
@@ -370,7 +370,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Two Factor Authentication Disabled'
-            ],204);
+            ]);
 
         } catch(\Exception $e){
             return response()->json([

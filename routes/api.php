@@ -54,7 +54,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     Route::middleware([])->prefix('/courses')->group(function (){
         // Todo
         Route::get('',[CoursesController::class,'getCourses']);
-        Route::get('/{id}',[CoursesController::class,'getCoursesById']);
+        Route::get('/{id}',[CoursesController::class,'getCoursesById'])->where('id','[0-9]+');
         Route::get('/search',[CoursesController::class,'searchCourses']);
         Route::get('/category/{slug}',[CoursesController::class,'getCoursesByCategory']);
     });

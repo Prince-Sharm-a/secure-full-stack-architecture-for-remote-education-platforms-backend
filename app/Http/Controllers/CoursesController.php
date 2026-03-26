@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\Module;
 use Illuminate\Http\Request;
 
 class CoursesController extends Controller
@@ -9,6 +12,28 @@ class CoursesController extends Controller
     //
     public function getCourses(Request $request){
         try{
+            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            ->select([
+                'courses.id',
+                'courses.title',
+                'courses.price',
+                'courses.level',
+                'courses.status',
+                'courses.category',
+                'users.id as teacher_id',
+                'users.name',
+                'users.profile_image'
+            ])
+            ->paginate(env('PAGINATE',10));
+            if(empty($data->data)){
+                return response()->json(['success' => false, 'message' => 'Not Found'],404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
 
         } catch(\Exception $e){
             return response()->json([
@@ -19,9 +44,33 @@ class CoursesController extends Controller
         }
     }
 
-    public function getCoursesById(Request $request){
+    public function getCoursesById(Request $request, $id){
         try{
+            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            ->with(['module:id,title','module.lesson:id,title'])
+            ->where('courses.id','=',$id)
+            ->select([
+                'courses.id',
+                'courses.title',
+                'courses.price',
+                'courses.level',
+                'courses.status',
+                'courses.category',
+                'courses.description',
+                'users.id as teacher_id',
+                'users.name',
+                'users.profile_image'
+            ])->first();
 
+            if(!$data){
+                return response()->json(['success' => false,'message' => 'Not Found'],404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e){
             return response()->json([
                 'success' => false,
@@ -43,9 +92,29 @@ class CoursesController extends Controller
         }
     }
 
-    public function getCoursesByCategory(Request $request){
+    public function getCoursesByCategory(Request $request,$slug){
         try{
+            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            ->where('category','like','%'.$slug.'%')
+            ->select([
+                'courses.id',
+                'courses.title',
+                'courses.price',
+                'courses.level',
+                'courses.status',
+                'courses.category',
+                'users.id as teacher_id',
+                'users.name',
+                'users.profile_image'
+            ])
+            ->paginate(env('PAGINATE',10));
 
+            
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e){
             return response()->json([
                 'success' => false,
@@ -79,9 +148,22 @@ class CoursesController extends Controller
         }
     }
 
-    public function deleteCourseTeacher(Request $request){
+    public function deleteCourseTeacher(Request $request,$id){
         try{
+            $user = $request->user();
+            $course = Course::where('teacher_id','=',$user->id)->where('id','=',$id)->first();
+            if(!$course){
+                return response()->json(['success'=>false,'message'=>'Not Found'],404);
+            }
+            $modules = Module::where('course_id','=',$id)->pluck('id');
+            Module::where('course_id','=',$id)->delete();
+            $lessons = Lesson::whereIn('module_id',$modules)->delete();
+            $course->delete();
 
+            return response()->json([
+                'success' => true,
+                'message' => 'Deleted Successfully'
+            ]);
         } catch(\Exception $e){
             return response()->json([
                 'success' => false,
@@ -93,7 +175,32 @@ class CoursesController extends Controller
 
     public function getCoursesTeacher(Request $request){
         try{
+            $user = $request->user();
+            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            ->with(['module:id,title','module.lesson:id,title,video_url,duration'])
+            ->where('teacher_id','=',$user->id)
+            ->select([
+                'courses.id',
+                'courses.title',
+                'courses.price',
+                'courses.level',
+                'courses.status',
+                'courses.category',
+                'users.id as teacher_id',
+                'users.name',
+                'users.profile_image'
+            ])
+            ->paginate(env('PAGINATE',10));
 
+            if(empty($data->data)){
+                return response()->json(['success'=>false,'message'=>'Not Found'],404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e){
             return response()->json([
                 'success' => false,
