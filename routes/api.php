@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CoursesController;
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,20 +53,27 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     Route::middleware([])->prefix('/courses')->group(function (){
-        // Todo
+        // 
         Route::get('',[CoursesController::class,'getCourses']);
         Route::get('/{id}',[CoursesController::class,'getCoursesById'])->where('id','[0-9]+');
-        Route::get('/search',[CoursesController::class,'searchCourses']);
+        Route::get('/search',[CoursesController::class,'searchCourses']); // todo
         Route::get('/category/{slug}',[CoursesController::class,'getCoursesByCategory']);
     });
 
-    Route::middleware([])->prefix('/teacher')->group(function (){
-        // todo
+    Route::middleware(['auth:sanctum'])->prefix('/teacher')->group(function (){
+        //
         Route::middleware([])->prefix('/courses')->group(function (){
             Route::post('',[CoursesController::class,'createCourseTeacher']);
             Route::put('/{id}',[CoursesController::class,'updateCourseTeacher']);
             Route::delete('/{id}',[CoursesController::class,'deleteCourseTeacher']);
             Route::get('',[CoursesController::class,'getCoursesTeacher']);
+            Route::get('/{course_id}/modules',[ModuleController::class,'gerCourseModules']);
+        });
+
+        Route::middleware([])->prefix('/modules')->group(function (){
+            Route::post('',[ModuleController::class,'createModules']);
+            Route::put('/{id}',[ModuleController::class,'updateModules']);
+            Route::delete('/{id}',[ModuleController::class,'deleteModules']);
         });
     });
 });
