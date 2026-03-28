@@ -13,6 +13,7 @@ class CoursesController extends Controller
     public function getCourses(Request $request){
         try{
             $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            ->where('courses.status','=','published')
             ->select([
                 'courses.id',
                 'courses.title',
@@ -95,7 +96,8 @@ class CoursesController extends Controller
     public function getCoursesByCategory(Request $request,$slug){
         try{
             $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
-            ->where('category','like','%'.$slug.'%')
+            ->where('courses.category','like','%'.$slug.'%')
+            ->where('courses.status','=','published')
             ->select([
                 'courses.id',
                 'courses.title',
@@ -138,8 +140,13 @@ class CoursesController extends Controller
             if($validation->fails()){
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
-            
-            $data = Course::create()
+            $data = Course::create(array_merge($request->only('title','description','price','level','status','category'),['teacher_id'=>$request->user()->id]));
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data->only('id','teacher_id','title','description','price','level','status','category')
+            ],201);
             
         } catch(\Exception $e){
             return response()->json([
@@ -152,6 +159,25 @@ class CoursesController extends Controller
 
     public function updateCourseTeacher(Request $request){
         try{
+            $rules = [
+                'course_id' => 'required | integer'
+            ];
+            $validation = \Validator::make($request->all(),$rules);
+            if($validation->fails()){
+                return response()->json(['success'=>false,'message'=>$validation->errors()],400);
+            }
+            $user = $request->user();
+            $data = Course::where('id','=',$request->course_id)->where('teacher_id','=',$user->id)->update($request->only('title','description','price','level','status','category'));
+            
+            if(!$data){
+                return response()->json(['success'=>false,'message'=>'Not Found']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data->only('id','title','description','price','level','status','category')
+            ]);
 
         } catch(\Exception $e){
             return response()->json([
