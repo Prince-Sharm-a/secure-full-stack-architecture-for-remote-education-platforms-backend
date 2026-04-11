@@ -140,7 +140,6 @@ class CoursesController extends Controller
             if($validation->fails()){
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
-<<<<<<< HEAD
             $data = Course::create(array_merge($request->only('title','description','price','level','status','category'),['teacher_id'=>$request->user()->id]));
 
             return response()->json([
@@ -148,10 +147,6 @@ class CoursesController extends Controller
                 'message' => '',
                 'data' => $data->only('id','teacher_id','title','description','price','level','status','category')
             ],201);
-=======
-            
-            $data = Course::create();
->>>>>>> cdb4f0a (initial commit)
             
         } catch(\Exception $e){
             return response()->json([
