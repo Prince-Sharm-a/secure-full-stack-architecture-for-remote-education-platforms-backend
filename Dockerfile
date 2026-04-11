@@ -21,4 +21,8 @@ RUN php artisan config:cache
 
 EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# 🔥 IMPORTANT: move cache commands to runtime
+CMD php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan config:cache && \
+    php artisan serve --host=0.0.0.0 --port=10000
