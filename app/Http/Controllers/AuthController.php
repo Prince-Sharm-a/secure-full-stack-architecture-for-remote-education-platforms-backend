@@ -114,13 +114,13 @@ class AuthController extends Controller
         try{
             $rules = [
                 'name' => "required",
-                'dob' => "required",
+                'dob' => "",
                 'role' => "string",
                 'status' => "string",
                 'gender' => "string | max:10",
                 'email' => "required | email",
                 'password' => "required | min:8",
-                'phone' => "required | min:10 | max:10",
+                'phone' => " min:10 | max:10",
                 'profile_image' => "string",
                 'email_verified_at' => ""
             ];
