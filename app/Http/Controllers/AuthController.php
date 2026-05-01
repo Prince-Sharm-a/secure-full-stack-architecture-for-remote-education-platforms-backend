@@ -69,7 +69,7 @@ class AuthController extends Controller
             }
 
             $loginCount = DB::table('personal_access_tokens')->where('tokenable_id','=',$user->id)->count();
-            if($loginCount > 2){
+            if($loginCount === 2){
                 return response()->json(['success'=>false,'message'=>'Already Logged in 2 Devices','device_logout'=>true]);
             }
 
@@ -156,7 +156,8 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'data' => []
             ],500);
         }
     }

@@ -217,7 +217,7 @@ class CoursesController extends Controller
         try{
             $user = $request->user();
             $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
-            ->with(['module:id,title','module.lesson:id,title,video_url,duration'])
+            // ->with(['module:id,title','module.lesson:id,title,video_url,duration'])
             ->where('teacher_id','=',$user->id)
             ->select([
                 'courses.id',
@@ -226,14 +226,11 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
-                'users.id as teacher_id',
-                'users.name',
-                'users.profile_image'
             ])
             ->paginate(env('PAGINATE',10));
 
-            if(empty($data->data)){
-                return response()->json(['success'=>false,'message'=>'Not Found'],404);
+            if(!$data){
+                return response()->json(['success'=>false,'message'=>'Not Found','data'=>[]],404);
             }
 
             return response()->json([
@@ -246,6 +243,7 @@ class CoursesController extends Controller
                 'success' => false,
                 'message' => $e->getMessage(),
                 'error' => $e->getMessage(),
+                'data' => []
             ],500);
         }
     }
