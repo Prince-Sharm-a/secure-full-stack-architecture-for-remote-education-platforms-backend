@@ -156,7 +156,8 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'data' => []
             ],500);
         }
     }
