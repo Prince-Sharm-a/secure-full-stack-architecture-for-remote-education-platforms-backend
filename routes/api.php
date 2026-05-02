@@ -122,13 +122,13 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     Route::middleware([])->prefix('')->group(function (){
-        Route::post('/enroll/{course_id}',[EnrollmentController::class,'enrollCourse'])->where('course_id','[0-9]+');
         
         Route::middleware([])->prefix('')->group(function (){
             // ? Enrollments
+            Route::post('/enroll/{course_id}',[EnrollmentController::class,'enrollCourse'])->where('course_id','[0-9]+');
             Route::get('/student/enrollments',[EnrollmentController::class,'getEnrollments']);
-            Route::get('/student/enrollments/{course_id}',[EnrollmentController::class,'getEnrollments'])->where('course_id','[0-9]+');
-            Route::get('/student/progress/{lesson_id}',[EnrollmentController::class,'updateStudentsLessonProgress'])->where('lesson_id','[0-9]+');
+            Route::get('/student/enrollments/{course_id}',[EnrollmentController::class,'getEnrollmentsByCourse'])->where('course_id','[0-9]+');
+            Route::put('/student/progress/{lesson_id}',[CoursesController::class,'updateStudentsLessonProgress'])->where('lesson_id','[0-9]+');
 
             // ? Assignment
             Route::middleware([])->prefix('')->group(function (){
