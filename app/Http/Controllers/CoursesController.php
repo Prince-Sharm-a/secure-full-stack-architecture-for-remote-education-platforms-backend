@@ -247,4 +247,17 @@ class CoursesController extends Controller
             ],500);
         }
     }
+
+    public function updateStudentsLessonProgress(Request $request, $lesson_id){
+        try{
+
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'data' => []
+            ],500);
+        }
+    }
 }
