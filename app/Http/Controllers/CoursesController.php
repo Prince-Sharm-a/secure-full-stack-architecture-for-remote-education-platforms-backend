@@ -248,6 +248,28 @@ class CoursesController extends Controller
         }
     }
 
+    public function getCoursesTeacherById(Request $request, $id){
+        try{
+            $user = $request->user();
+            $data = Course::where('id','=',$id)
+            ->where('teacher_id','=',$user->id)
+            ->select([
+                'id','teacher_id','title','description','price','level','status','category'
+            ])->get();
+
+            if(!$data){
+                return response()->json(['success'=>false,'message'=>'Not Found','data'=>[]],404);
+            }
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'data' => []
+            ],500);
+        }
+    }
+
     public function updateStudentsLessonProgress(Request $request, $lesson_id){
         try{
 
