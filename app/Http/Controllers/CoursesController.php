@@ -260,6 +260,11 @@ class CoursesController extends Controller
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found','data'=>[]],404);
             }
+            return response()->json([
+                'success' => false,
+                'message' => '',
+                'data' => $data
+            ],500);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,
