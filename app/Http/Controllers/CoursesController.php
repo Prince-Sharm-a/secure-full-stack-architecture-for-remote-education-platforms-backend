@@ -264,7 +264,7 @@ class CoursesController extends Controller
                 'success' => false,
                 'message' => '',
                 'data' => $data
-            ],500);
+            ]);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,
