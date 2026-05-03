@@ -81,6 +81,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::put('/teacher/courses/{id}',[CoursesController::class,'updateCourseTeacher']);
             Route::delete('/teacher/courses/{id}',[CoursesController::class,'deleteCourseTeacher']);
             Route::get('/teacher/courses',[CoursesController::class,'getCoursesTeacher']);
+            Route::get('/teacher/courses{id}',[CoursesController::class,'getCoursesTeacherById'])->where('id','[0-9]+');
         });
 
         Route::middleware([])->prefix('')->group(function (){
