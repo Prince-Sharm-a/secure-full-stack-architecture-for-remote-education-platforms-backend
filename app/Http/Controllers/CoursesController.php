@@ -255,7 +255,7 @@ class CoursesController extends Controller
             ->where('teacher_id','=',$user->id)
             ->select([
                 'id','teacher_id','title','description','price','level','status','category'
-            ])->get();
+            ])->first();
 
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found','data'=>[]],404);
