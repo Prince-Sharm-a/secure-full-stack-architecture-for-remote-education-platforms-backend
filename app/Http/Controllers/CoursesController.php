@@ -166,7 +166,8 @@ class CoursesController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
             $user = $request->user();
-            $data = Course::where('id','=',$id)->where('teacher_id','=',$user->id)->update($request->only('title','description','price','level','status','category'));
+            $data = Course::where('id','=',$id)->where('teacher_id','=',$user->id)->first();
+            $data->update($request->only('title','description','price','level','status','category'));
             
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found']);
