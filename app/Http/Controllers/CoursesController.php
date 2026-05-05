@@ -49,6 +49,7 @@ class CoursesController extends Controller
         try{
             $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
             ->with(['module:id,title','module.lesson:id,title'])
+            ->where('courses.status','=','published')
             ->where('courses.id','=',$id)
             ->select([
                 'courses.id',
@@ -140,7 +141,14 @@ class CoursesController extends Controller
             if($validation->fails()){
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
-            $data = Course::create(array_merge($request->only('title','description','price','level','status','category'),['teacher_id'=>$request->user()->id]));
+
+            $value = $request->only('title','description','price','level','status','category');
+            $value['teacher_id'] = $request->user()->id;
+            if(!empty($request->levelFrom) && !empty($request->levelTo)){
+                $value['level'] = $request->levelFrom." to ".$request->levelTo;
+            }
+
+            $data = Course::create($value);
 
             return response()->json([
                 'success' => true,
@@ -166,8 +174,12 @@ class CoursesController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
             $user = $request->user();
+            $value = $request->only('title','description','price','status','category');
+            if(!empty($request->levelFrom) && !empty($request->levelTo)){
+                $value['level'] = $request->levelFrom." to ".$request->levelTo;
+            }
             $data = Course::where('id','=',$id)->where('teacher_id','=',$user->id)->first();
-            $data->update($request->only('title','description','price','level','status','category'));
+            $data->update($value);
             
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found']);
