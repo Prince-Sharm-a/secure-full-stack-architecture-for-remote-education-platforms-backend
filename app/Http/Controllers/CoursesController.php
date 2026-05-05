@@ -157,17 +157,16 @@ class CoursesController extends Controller
         }
     }
 
-    public function updateCourseTeacher(Request $request){
+    public function updateCourseTeacher(Request $request, $id){
         try{
             $rules = [
-                'course_id' => 'required | integer'
             ];
             $validation = \Validator::make($request->all(),$rules);
             if($validation->fails()){
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
             $user = $request->user();
-            $data = Course::where('id','=',$request->course_id)->where('teacher_id','=',$user->id)->update($request->only('title','description','price','level','status','category'));
+            $data = Course::where('id','=',$id)->where('teacher_id','=',$user->id)->update($request->only('title','description','price','level','status','category'));
             
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found']);
