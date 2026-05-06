@@ -136,7 +136,8 @@ class CoursesController extends Controller
                 'title' => 'required | max:255 | string',
                 'description' => 'nullable | string',
                 'price' => 'required | numeric | min:0',
-                'level' => 'required | string',
+                'levelFrom' => 'required | string',
+                'levelTo' => 'required | sting',
                 'status' => 'required | string',
                 'category' => 'required | string'
             ];
