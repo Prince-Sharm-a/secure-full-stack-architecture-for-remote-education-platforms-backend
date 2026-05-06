@@ -145,7 +145,7 @@ class CoursesController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
 
-            $value = $request->only('title','description','price','level','status','category');
+            $value = $request->only('title','description','price','level','status','category','cover_image');
             $value['teacher_id'] = $request->user()->id;
             if(!empty($request->levelFrom) && !empty($request->levelTo)){
                 $value['level'] = $request->levelFrom." to ".$request->levelTo;
