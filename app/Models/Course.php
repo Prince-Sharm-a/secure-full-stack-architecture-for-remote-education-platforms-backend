@@ -9,7 +9,7 @@ class Course extends Model
 {
     //
     protected $fillable = [
-        'teacher_id','title','description','price','level','status','category'
+        'teacher_id','title','description','price','level','status','category','cover_image'
     ];
 
     public function module(){

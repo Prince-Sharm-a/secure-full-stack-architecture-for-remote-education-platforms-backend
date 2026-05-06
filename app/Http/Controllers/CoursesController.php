@@ -21,6 +21,7 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
+                'courses.cover_image',
                 'users.id as teacher_id',
                 'users.name',
                 'users.profile_image'
@@ -59,6 +60,7 @@ class CoursesController extends Controller
                 'courses.status',
                 'courses.category',
                 'courses.description',
+                'courses.cover_image',
                 'users.id as teacher_id',
                 'users.name',
                 'users.profile_image'
@@ -106,6 +108,7 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
+                'courses.cover_image',
                 'users.id as teacher_id',
                 'users.name',
                 'users.profile_image'
@@ -153,7 +156,7 @@ class CoursesController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => '',
-                'data' => $data->only('id','teacher_id','title','description','price','level','status','category')
+                'data' => $data->only('id','teacher_id','title','description','price','level','status','category','cover_image')
             ],201);
             
         } catch(\Exception $e){
@@ -188,7 +191,7 @@ class CoursesController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => '',
-                'data' => $data->only('id','title','description','price','level','status','category')
+                'data' => $data->only('id','title','description','price','level','status','category','cover_image')
             ]);
 
         } catch(\Exception $e){
@@ -238,6 +241,7 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
+                'courses.cover_image'
             ])
             ->paginate(env('PAGINATE',10));
 
@@ -266,7 +270,7 @@ class CoursesController extends Controller
             $data = Course::where('id','=',$id)
             ->where('teacher_id','=',$user->id)
             ->select([
-                'id','teacher_id','title','description','price','level','status','category'
+                'id','teacher_id','title','description','price','level','status','category','cover_image'
             ])->first();
 
             if(!$data){
