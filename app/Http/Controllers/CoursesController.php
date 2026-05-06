@@ -21,6 +21,7 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
+                'courses.cover_image',
                 'users.id as teacher_id',
                 'users.name',
                 'users.profile_image'
@@ -49,6 +50,7 @@ class CoursesController extends Controller
         try{
             $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
             ->with(['module:id,title','module.lesson:id,title'])
+            ->where('courses.status','=','published')
             ->where('courses.id','=',$id)
             ->select([
                 'courses.id',
@@ -58,6 +60,7 @@ class CoursesController extends Controller
                 'courses.status',
                 'courses.category',
                 'courses.description',
+                'courses.cover_image',
                 'users.id as teacher_id',
                 'users.name',
                 'users.profile_image'
@@ -105,6 +108,7 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
+                'courses.cover_image',
                 'users.id as teacher_id',
                 'users.name',
                 'users.profile_image'
@@ -140,12 +144,19 @@ class CoursesController extends Controller
             if($validation->fails()){
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
-            $data = Course::create(array_merge($request->only('title','description','price','level','status','category'),['teacher_id'=>$request->user()->id]));
+
+            $value = $request->only('title','description','price','level','status','category','cover_image');
+            $value['teacher_id'] = $request->user()->id;
+            if(!empty($request->levelFrom) && !empty($request->levelTo)){
+                $value['level'] = $request->levelFrom." to ".$request->levelTo;
+            }
+
+            $data = Course::create($value);
 
             return response()->json([
                 'success' => true,
                 'message' => '',
-                'data' => $data->only('id','teacher_id','title','description','price','level','status','category')
+                'data' => $data->only('id','teacher_id','title','description','price','level','status','category','cover_image')
             ],201);
             
         } catch(\Exception $e){
@@ -166,8 +177,12 @@ class CoursesController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
             $user = $request->user();
+            $value = $request->only('title','description','price','status','category','cover_image');
+            if(!empty($request->levelFrom) && !empty($request->levelTo)){
+                $value['level'] = $request->levelFrom." to ".$request->levelTo;
+            }
             $data = Course::where('id','=',$id)->where('teacher_id','=',$user->id)->first();
-            $data->update($request->only('title','description','price','level','status','category'));
+            $data->update($value);
             
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found']);
@@ -176,7 +191,7 @@ class CoursesController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => '',
-                'data' => $data->only('id','title','description','price','level','status','category')
+                'data' => $data->only('id','title','description','price','level','status','category','cover_image')
             ]);
 
         } catch(\Exception $e){
@@ -226,6 +241,7 @@ class CoursesController extends Controller
                 'courses.level',
                 'courses.status',
                 'courses.category',
+                'courses.cover_image'
             ])
             ->paginate(env('PAGINATE',10));
 
@@ -254,7 +270,7 @@ class CoursesController extends Controller
             $data = Course::where('id','=',$id)
             ->where('teacher_id','=',$user->id)
             ->select([
-                'id','teacher_id','title','description','price','level','status','category'
+                'id','teacher_id','title','description','price','level','status','category','cover_image'
             ])->first();
 
             if(!$data){
