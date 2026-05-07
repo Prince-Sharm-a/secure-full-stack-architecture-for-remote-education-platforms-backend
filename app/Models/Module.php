@@ -12,6 +12,6 @@ class Module extends Model
     ];
     
     public function lesson(){
-        return $this->belongsTo(Lesson::class,'id','module_id');
+        return $this->hasMany(Lesson::class,'id','module_id');
     }
 }
