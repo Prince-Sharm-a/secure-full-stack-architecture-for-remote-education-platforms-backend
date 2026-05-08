@@ -11,7 +11,18 @@ class ModuleController extends Controller
     //
     public function gerCourseModulesTeacher(Request $request, $course_id){
         try{
+            $user = $request->user();
+            $data = Module::leftJoin('courses','courses.id','=','modules.course_id')->where('modules.course_id','=',$course_id)->where('courses.teacher_id','=',$user->id)->select(['modules.id','modules.course_id','modules.title'])->get();
 
+            if(!$data){
+                return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,
