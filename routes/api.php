@@ -88,14 +88,14 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::post('/teacher/modules',[ModuleController::class,'createModulesTeacher']);
             Route::put('/teacher/modules/{id}',[ModuleController::class,'updateModulesTeacher'])->where('id','[0-9]+');
             Route::delete('/teacher/modules/{id}',[ModuleController::class,'deleteModulesTeacher'])->where('id','[0-9]+');
-            Route::get('/courses/{course_id}/modules',[ModuleController::class,'gerCourseModulesTeacher'])->where('course_id','[0-9]+');
+            Route::get('/courses/{course_id}/modules',[ModuleController::class,'gerCourseModules'])->where('course_id','[0-9]+');
         });
 
         Route::middleware([])->prefix('/lessons')->group(function (){
             Route::post('/teacher/lessons',[LessonController::class,'createLessonTeacher']);
             Route::put('/teacher/lessons/{id}',[LessonController::class,'updateLessonTeacher'])->where('id','[0-9]+');
             Route::delete('/teacher/lessons/{id}',[LessonController::class,'deleteLessonTeacher'])->where('id','[0-9]+');
-            Route::get('/modules/{module_id}/lessons',[LessonController::class,'getModulesLessonTeacher'])->where('module_id','[0-9]+');
+            Route::get('/modules/{module_id}/lessons',[LessonController::class,'getModulesLesson'])->where('module_id','[0-9]+');
             Route::get('/lessons/{id}',[LessonController::class,'getLessonById'])->where('id','[0-9]+');
         });
 

@@ -9,10 +9,9 @@ use Illuminate\Http\Request;
 class ModuleController extends Controller
 {
     //
-    public function gerCourseModulesTeacher(Request $request, $course_id){
+    public function gerCourseModules(Request $request, $course_id){
         try{
-            $user = $request->user();
-            $data = Module::leftJoin('courses','courses.id','=','modules.course_id')->where('modules.course_id','=',$course_id)->where('courses.teacher_id','=',$user->id)->select(['modules.id','modules.course_id','modules.title'])->get();
+            $data = Module::where('course_id','=',$course_id)->select(['id','course_id','title'])->get();
 
             if(!$data){
                 return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
