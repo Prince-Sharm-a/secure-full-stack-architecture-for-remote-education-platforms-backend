@@ -11,7 +11,7 @@ class LessonController extends Controller
     public function getModulesLesson(Request $request, $module_id){
         try{
             
-            $data = Lesson::where('module_id','=',$module_id)->select(['id','module_id','title'])->get();
+            $data = Lesson::where('module_id','=',$module_id)->select(['id','module_id','title'])->orderBy('created_at')->get();
 
             if(!$data){
                 return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
