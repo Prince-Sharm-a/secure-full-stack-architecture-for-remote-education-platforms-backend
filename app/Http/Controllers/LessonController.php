@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lesson;
+use App\Models\Module;
 use Illuminate\Http\Request;
 
 class LessonController extends Controller
@@ -34,7 +35,28 @@ class LessonController extends Controller
 
     public function createLessonTeacher(Request $request){
         try{
+            $rules = [
+                'module_id' => 'required',
+                'title' => 'required'
+            ];
+            $validation = \Validator::make($request->all(),$rules);
+            if($validation->fails()){
+                return response()->json(['success'=>false,'message'=>$validation->errors()],400);
+            }
+            $user = $request->user();
+            
+            $check = Module::leftJoin('courses','courses.id','=','modules.course_id')->where('modules.id','=',$request->module_id)->where('courses.teacher_id','=',$user->id)->first();
+            if(!$check){
+                return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
+            }
 
+            $data = Lesson::create($request->only('module_id','title'));
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -91,7 +91,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::get('/courses/{course_id}/modules',[ModuleController::class,'gerCourseModules'])->where('course_id','[0-9]+');
         });
 
-        Route::middleware([])->prefix('/lessons')->group(function (){
+        Route::middleware([])->prefix('')->group(function (){
             Route::post('/teacher/lessons',[LessonController::class,'createLessonTeacher']);
             Route::put('/teacher/lessons/{id}',[LessonController::class,'updateLessonTeacher'])->where('id','[0-9]+');
             Route::delete('/teacher/lessons/{id}',[LessonController::class,'deleteLessonTeacher'])->where('id','[0-9]+');
