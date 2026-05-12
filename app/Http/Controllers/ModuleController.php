@@ -35,7 +35,8 @@ class ModuleController extends Controller
     public function createModulesTeacher(Request $request){
         try{
             $rules = [
-                'course_id' => 'required'
+                'course_id' => 'required',
+                'title' => 'required'
             ];
             $validation = \Validator::make($request->all(),$rules);
             if($validation->fails()){
