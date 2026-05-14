@@ -54,7 +54,7 @@ class ModuleController extends Controller
                 'success' => true,
                 'message' => '',
                 'data' => $data->only('id','course_id','title')
-            ]);
+            ],201);
 
         } catch(\Exception $e) {
             return response()->json([

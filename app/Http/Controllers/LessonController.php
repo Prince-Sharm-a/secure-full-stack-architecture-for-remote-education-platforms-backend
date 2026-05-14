@@ -56,7 +56,7 @@ class LessonController extends Controller
                 'success' => true,
                 'message' => '',
                 'data' => $data
-            ]);
+            ],201);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -107,7 +107,17 @@ class LessonController extends Controller
 
     public function getLessonById(Request $request, $id){
         try{
+            $data = Lesson::where('id','=',$id)->select(['id','title','video_url'])->first();
 
+            if(!$data){
+                return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,
