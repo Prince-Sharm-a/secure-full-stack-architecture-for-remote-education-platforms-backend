@@ -96,7 +96,7 @@ class AssignmentController extends Controller
                                     'courses' => function ($query) {
                                         $query->select(['id','title'])->withCount('students');
                                     }
-                                ])->where('course_id','=',$course_id)->select(['id','course_id','title'])->withCount('submission') ->latest('created_at')->get();
+                                ])->where('course_id','=',$course_id)->select(['id','course_id','title','due_date'])->withCount('submission') ->latest('created_at')->get();
 
             if(!$data){
                 return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
