@@ -82,7 +82,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::delete('/teacher/courses/{id}',[CoursesController::class,'deleteCourseTeacher']);
             Route::get('/teacher/courses',[CoursesController::class,'getCoursesTeacher']);
             Route::get('/teacher/courses/{id}',[CoursesController::class,'getCoursesTeacherById'])->where('id','[0-9]+');
-            Route
+            Route::get('/teacher/coursesList', [CoursesController::class, 'getCoursesList']);
         });
 
         Route::middleware([])->prefix('')->group(function (){
