@@ -14,7 +14,8 @@ class AssignmentController extends Controller
             $rules = [
                 'course_id' => 'required',
                 'title' => 'required',
-                'due_date' => 'required'
+                'due_date' => 'required',
+                'description' => 'required'
             ];
             $validation = \Validator::make($request->all(),$rules);
             if($validation->fails()){
@@ -91,7 +92,11 @@ class AssignmentController extends Controller
 
     public function getCourseAssignments(Request $request, $course_id){
         try{
-            $data = Assignment::withCount('submission','courses.students')->where('course_id','=',$course_id)->select(['id','course_id','title'])->latest('created_at')->get();
+            $data = Assignment::with([
+                                    'courses' => function ($query) {
+                                        $query->select(['id','title'])->withCount('students');
+                                    }
+                                ])->where('course_id','=',$course_id)->select(['id','course_id','title'])->withCount('submission') ->latest('created_at')->get();
 
             if(!$data){
                 return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
