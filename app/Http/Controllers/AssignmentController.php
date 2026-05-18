@@ -91,6 +91,29 @@ class AssignmentController extends Controller
 
     public function getCourseAssignments(Request $request, $course_id){
         try{
+            $data = Assignment::withCount('submission','courses.students')->where('course_id','=',$course_id)->select(['id','course_id','title'])->latest('created_at')->get();
+
+            if(!$data){
+                return response()->json(['success' => false,'message' => 'Not Found','data' => []],404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'data' => []
+            ],500);
+        }
+    }
+
+    public function getStudentCourseAssignments(Request $request, $course_id){
+        try{
             $data = Assignment::where('course_id','=',$course_id)->select(['id','course_id','title'])->latest('created_at')->get();
 
             if(!$data){
