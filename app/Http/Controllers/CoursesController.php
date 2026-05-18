@@ -232,7 +232,7 @@ class CoursesController extends Controller
     public function getCoursesTeacher(Request $request){
         try{
             $user = $request->user();
-            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')->withCount('students')
             // ->with(['module:id,title','module.lesson:id,title,video_url,duration'])
             ->where('teacher_id','=',$user->id)
             ->select([
@@ -277,6 +277,30 @@ class CoursesController extends Controller
             if(!$data){
                 return response()->json(['success'=>false,'message'=>'Not Found','data'=>[]],404);
             }
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'data' => []
+            ],500);
+        }
+    }
+
+    public function getCoursesList(Request $request){
+        try{
+            $user = $request->user();
+            $data = Course::where('teacher_id','=',$user->id)->where('status','=','published')->pluck('title','id');
+
+            if(!$data){
+                return response()->json(['success'=>false,'message'=>'Not Found','data'=>[]],404);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => '',

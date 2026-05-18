@@ -82,6 +82,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::delete('/teacher/courses/{id}',[CoursesController::class,'deleteCourseTeacher']);
             Route::get('/teacher/courses',[CoursesController::class,'getCoursesTeacher']);
             Route::get('/teacher/courses/{id}',[CoursesController::class,'getCoursesTeacherById'])->where('id','[0-9]+');
+            Route::get('/teacher/coursesList', [CoursesController::class, 'getCoursesList']);
         });
 
         Route::middleware([])->prefix('')->group(function (){
@@ -105,7 +106,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::post('/teacher/assignments',[AssignmentController::class,'createAssignment']);
             Route::put('/teacher/assignments/{id}',[AssignmentController::class,'updateAssignment'])->where('id','[0-9]+');
             Route::delete('/teacher/assignments/{id}',[AssignmentController::class,'deleteAssignment'])->where('id','[0-9]+');
-            Route::get('/course/{course_id}/assignments',[AssignmentController::class,'getCourseAssignments'])->where('course_id','[0-9]+');
+            Route::get('/teacher/course/{course_id}/assignments',[AssignmentController::class,'getCourseAssignments'])->where('course_id','[0-9]+');
         });
 
         // ? Grading 
@@ -133,7 +134,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
 
             // ? Assignment
             Route::middleware([])->prefix('')->group(function (){
-                Route::get('/student/course/{course_id}/assignments',[AssignmentController::class,'getCourseAssignments']);
+                Route::get('/student/course/{course_id}/assignments',[AssignmentController::class,'getStudentCourseAssignments']);
                 Route::post('/student/submissions',[SubmissionController::class,'createAssignmentSubmission']);
                 Route::get('/student/submissions/{assignment_id}',[SubmissionController::class,'getAssignmentSubmission']);
             });
