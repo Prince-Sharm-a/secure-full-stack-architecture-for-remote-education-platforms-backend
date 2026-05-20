@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\Module;
 use Illuminate\Http\Request;
@@ -319,6 +320,50 @@ class CoursesController extends Controller
     public function updateStudentsLessonProgress(Request $request, $lesson_id){
         try{
 
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'data' => []
+            ],500);
+        }
+    }
+
+    public function getStudentCourses(Request $request){
+        try{
+            $user = $request->user();
+            $course_ids = Enrollment::where('user_id',$user->id)->pluck('course_id')->toArray();
+
+            $data = Course::whereIn('id',$course_ids)->where('status','=','published')->select(['id','teacher_id','title','level','status','category','cover_image'])->with(['teacher:id,name'])->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
+        } catch(\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'data' => []
+            ],500);
+        }
+    }
+
+    public function getStudentCoursesById(Request $request, $id){
+        try{
+            $user = $request->user();
+            $course_id = Enrollment::where('user_id',$user->id)->value('course_id');
+
+            $data = Course::where('id',$course_id)->where('status','=','published')->select(['id','teacher_id','title','level','status','category','cover_image'])->with(['teacher:id,name','module:id,title'])->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => '',
+                'data' => $data
+            ]);
         } catch(\Exception $e) {
             return response()->json([
                 'success' => false,

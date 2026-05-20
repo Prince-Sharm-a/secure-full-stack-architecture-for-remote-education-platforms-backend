@@ -13,7 +13,7 @@ class Course extends Model
     ];
 
     public function module(){
-        return $this->belongsTo(Module::class,'id','course_id');
+        return $this->hasMany(Module::class,'course_id','id');
     }
     public function teacher(){
         return $this->belongsTo(User::class,'teacher_id');
