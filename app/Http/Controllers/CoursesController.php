@@ -28,9 +28,6 @@ class CoursesController extends Controller
                 'users.profile_image'
             ])
             ->paginate(env('PAGINATE',10));
-            if(empty($data->data)){
-                return response()->json(['success' => false, 'message' => 'No Data'],404);
-            }
 
             return response()->json([
                 'success' => true,
@@ -335,7 +332,7 @@ class CoursesController extends Controller
             $user = $request->user();
             $course_ids = Enrollment::where('user_id',$user->id)->pluck('course_id')->toArray();
 
-            $data = Course::whereIn('id',$course_ids)->where('status','=','published')->select(['id','teacher_id','title','level','status','category','cover_image'])->with(['teacher:id,name'])->get();
+            $data = Course::whereIn('id',$course_ids)->where('status','=','published')->select(['id','teacher_id','title','level','category','cover_image'])->with(['teacher:id,name'])->get();
 
             return response()->json([
                 'success' => true,
