@@ -121,6 +121,11 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::get('/teacher/analytics/{course_id}',[AnalyticsController::class,'courseAnalytics'])->where('course_id','[0-9]+');
             Route::get('/teacher/revenue-report',[AnalyticsController::class,'getTeacherRevenueReport']);
         });
+
+        // ? Student
+        Route::middleware([])->prefix('')->group(function (){
+            Route::get('/teacher/students/{course_id}',[EnrollmentController::class,'getEnrolledStudent'])->where('course_id','[0-9]+');
+        });
     });
 
     Route::middleware([])->prefix('')->group(function (){
