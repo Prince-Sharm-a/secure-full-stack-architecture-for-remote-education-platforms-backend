@@ -357,7 +357,7 @@ class CoursesController extends Controller
             $user = $request->user();
             $course_id = Enrollment::where('user_id',$user->id)->value('course_id');
 
-            $data = Course::where('id',$course_id)->where('status','=','published')->select(['id','teacher_id','title','level','status','category','cover_image'])->with(['teacher:id,name','module:id,title'])->get();
+            $data = Course::where('id',$course_id)->where('status','=','published')->select(['id','teacher_id','title','description','level','status','category','cover_image'])->with(['teacher:id,name','module:id,title'])->first();
 
             return response()->json([
                 'success' => true,
