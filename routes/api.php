@@ -131,6 +131,9 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     Route::middleware([])->prefix('')->group(function (){
         
         Route::middleware([])->prefix('')->group(function (){
+            Route::get('/student/courses', [CoursesController::class, 'getStudentCourses']);
+            Route::get('/student/courses/{id}', [CoursesController::class, 'getStudentCoursesById'])->where('id','[0-9]+');
+
             // ? Enrollments
             Route::post('/enroll/{course_id}',[EnrollmentController::class,'enrollCourse'])->where('course_id','[0-9]+');
             Route::get('/student/enrollments',[EnrollmentController::class,'getEnrollments']);
