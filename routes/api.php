@@ -64,6 +64,10 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         Route::get('/user/active-devices',[UserController::class,'activeDevices']);
         Route::delete('/user/logout-devices/{id}',[UserController::class,'logoutDevices']);
         Route::delete('/user/delete-account',[UserController::class,'deleteAccount']);
+
+        // ? Payment
+        Route::post('/create-order', [PaymentController::class, 'createOrder']);
+        Route::post('/verify-payment', [PaymentController::class, 'verifyPayment']);
     });
 
     Route::middleware([])->prefix('')->group(function (){
