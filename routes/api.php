@@ -64,10 +64,6 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         Route::get('/user/active-devices',[UserController::class,'activeDevices']);
         Route::delete('/user/logout-devices/{id}',[UserController::class,'logoutDevices']);
         Route::delete('/user/delete-account',[UserController::class,'deleteAccount']);
-
-        // ? Payment
-        Route::post('/create-order', [PaymentController::class, 'createOrder']);
-        Route::post('/verify-payment', [PaymentController::class, 'verifyPayment']);
     });
 
     Route::middleware([])->prefix('')->group(function (){
@@ -132,7 +128,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         });
     });
 
-    Route::middleware([])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
         
         Route::middleware([])->prefix('')->group(function (){
             Route::get('/student/courses', [CoursesController::class, 'getStudentCourses']);
@@ -161,14 +157,15 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     // ? Payment
-    Route::middleware([])->prefix('')->group(function (){
-        Route::post('/payment/create-order',[PaymentController::class,'createOrder']);
-        Route::post('/payment/verify',[PaymentController::class,'verifyPayment']);
+    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
+        // ? Payment
+        Route::post('/create-order', [PaymentController::class, 'createOrder']);
+        Route::post('/verify-payment', [PaymentController::class, 'verifyPayment']);
         Route::get('/student/payment-history',[PaymentController::class,'getPaymentHistory']);
         Route::post('/payment/webhook',[PaymentController::class,'paymentWebhook']);
     });
 
-    Route::middleware([])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
         Route::get('/security/login-logs',[AuthController::class,'getLoginLogs']);
         Route::get('/security/access-logs',[AuthController::class,'getAccessLogs']);
         Route::get('/security/audit-logs',[AuthController::class,'getAuditLogs']);
@@ -176,7 +173,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     // ? admin
-    Route::middleware([])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
         Route::get('/admin/failed-logins',[UserController::class,'getFailedLogins']);
         Route::get('/admin/block-user/{id}',[UserController::class,'blockUser']);
         Route::post('/admin/unblock-user/{id}',[UserController::class,'unblockUser']);
@@ -193,7 +190,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     // ? upload api
-    Route::middleware([])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
         Route::post('/upload/video',[FeatureController::class,'uploadVideo']);
         Route::post('/upload/document',[FeatureController::class,'uploadDocument']);
         Route::delete('/upload/{id}',[FeatureController::class,'deleteUploadsContent']);
