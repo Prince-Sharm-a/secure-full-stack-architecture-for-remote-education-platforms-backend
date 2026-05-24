@@ -13,19 +13,15 @@ class CoursesController extends Controller
     //
     public function getCourses(Request $request){
         try{
-            $data = Course::leftJoin('users','users.id','=','courses.teacher_id')
+            $data = Course::with(['teacher:id,name'])
             ->where('courses.status','=','published')
             ->select([
-                'courses.id',
-                'courses.title',
-                'courses.price',
-                'courses.level',
-                'courses.status',
-                'courses.category',
-                'courses.cover_image',
-                'users.id as teacher_id',
-                'users.name',
-                'users.profile_image'
+                'id',
+                'teacher_id',
+                'title',
+                'level',
+                'category',
+                'cover_image'
             ])
             ->paginate(env('PAGINATE',10));
 

@@ -8,6 +8,6 @@ class Payment extends Model
 {
     //
     protected $fillable = [
-        'user_id','course_id','amount','method','status','transaction_id'
+        'user_id','course_id','amount','method','status','transaction_id','razorpay_payment_id','razorpay_signature','razorpay_order_id'
     ];
 }
