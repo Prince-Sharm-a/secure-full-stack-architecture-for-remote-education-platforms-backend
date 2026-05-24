@@ -76,10 +76,7 @@ class PaymentController extends Controller
                 return response()->json(['success'=>false,'message'=>$validation->errors()],400);
             }
 
-            $api = new Api(
-                config('razorpay.key'),
-                config('razorpay.secret')
-            );
+            $api = new Api(env('ROZARPAY_KEY_ID'), env('ROZARPAY_SECRET'));
 
             $attributes = [
                 'razorpay_order_id' => $request->razorpay_order_id,
