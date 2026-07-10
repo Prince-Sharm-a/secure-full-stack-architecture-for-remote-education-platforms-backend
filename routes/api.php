@@ -23,7 +23,7 @@ Route::get('/test',function (){
 
 Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     
-    Route::middleware([])->prefix('')->group(function (){
+    Route::middleware(['throttle:login'])->prefix('')->group(function (){
 
         Route::post('/auth/login',[AuthController::class,'login'])->name('login');
         Route::post('/auth/register',[AuthController::class,'register'])->name('register');
@@ -74,7 +74,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         Route::get('/courses/category/{slug}',[CoursesController::class,'getCoursesByCategory']);
     });
 
-    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum','role:teacher,admin,dev','account:active'])->prefix('')->group(function (){
         // ? Course
         Route::middleware([])->prefix('')->group(function (){
             Route::post('/teacher/courses',[CoursesController::class,'createCourseTeacher']);
@@ -128,9 +128,9 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
         });
     });
 
-    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum','role:student,dev,admin','account:active'])->prefix('')->group(function (){
         
-        Route::middleware([])->prefix('')->group(function (){
+        Route::middleware(['throttle:api'])->prefix('')->group(function (){
             Route::get('/student/courses', [CoursesController::class, 'getStudentCourses']);
             Route::get('/student/courses/{id}', [CoursesController::class, 'getStudentCoursesById'])->where('id','[0-9]+');
 
@@ -157,7 +157,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     // ? Payment
-    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum','verified','account:active'])->prefix('')->group(function (){
         // ? Payment
         Route::post('/create-order', [PaymentController::class, 'createOrder']);
         Route::post('/verify-payment', [PaymentController::class, 'verifyPayment']);
@@ -173,7 +173,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     });
 
     // ? admin
-    Route::middleware(['auth:sanctum'])->prefix('')->group(function (){
+    Route::middleware(['auth:sanctum','role:admin,dev','account:active'])->prefix('')->group(function (){
         Route::get('/admin/failed-logins',[UserController::class,'getFailedLogins']);
         Route::get('/admin/block-user/{id}',[UserController::class,'blockUser']);
         Route::post('/admin/unblock-user/{id}',[UserController::class,'unblockUser']);

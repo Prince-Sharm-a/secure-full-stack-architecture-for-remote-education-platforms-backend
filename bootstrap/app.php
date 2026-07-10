@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Middleware\AccountActiveMiddleware;
 use App\Http\Middleware\DelayResponse;
+use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\VerifiedMiddleware;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         //
         $middleware->alias([    
             'delay.response' => DelayResponse::class,
+            'role' => RoleMiddleware::class,
+            'verified' => VerifiedMiddleware::class,
+            'account' => AccountActiveMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
