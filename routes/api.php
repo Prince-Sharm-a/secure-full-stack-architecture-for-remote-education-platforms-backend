@@ -100,7 +100,7 @@ Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
             Route::get('/lessons/{id}',[LessonController::class,'getLessonById'])->where('id','[0-9]+');
         });
 
-        // ? Assigment API's
+        // ? Assignment API's
 
         Route::middleware([])->prefix('')->group(function (){
             Route::post('/teacher/assignments',[AssignmentController::class,'createAssignment']);
