@@ -46,6 +46,7 @@ class GoogleAuthController extends Controller
 
             return response()->view('auth.google-success',['code' => $code]);
         } catch (\Exception $e){
+            echo($e->getMessage());
             return response()->json(['error' => $e->getMessage(), 'message' => 'Google Authentication failed.'], 400);
         }
     }
