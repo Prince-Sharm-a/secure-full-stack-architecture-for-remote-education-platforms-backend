@@ -21,6 +21,15 @@ Route::get('/test',function (){
     ];
 });
 
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'user' => $request->user(),
+    ]);
+});
+
+Route::post('/auth/oauth/exchange', [App\Http\Controllers\Auth\GoogleAuthController::class, 'exchange'])->name('auth.google.exchange');
+
 Route::middleware(['delay.response'])->prefix('/v1')->group(function (){
     
     Route::middleware(['throttle:login'])->prefix('')->group(function (){
