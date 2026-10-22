@@ -20,11 +20,11 @@ class GoogleAuthController extends Controller
         try{
             $googleUser = Socialite::driver('google')->stateless()->user();
 
-            echo("Google User Email: " . $googleUser->getEmail());
+            print_r("Google User Email: " . $googleUser->getEmail());
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            echo("User: $user");
+            print_r("User: $user");
 
             if(!$user){
                 $user = User::create([
@@ -38,7 +38,7 @@ class GoogleAuthController extends Controller
                 ]);
             }
 
-            echo("User ID: $user->id");
+            print_r("User ID: $user->id");
 
             $token = $user->createToken('api-token')->plainTextToken;
 
@@ -52,7 +52,7 @@ class GoogleAuthController extends Controller
 
             return response()->view('auth.google-success',['code' => $code]);
         } catch (\Exception $e){
-            echo("Error: " . $e->getMessage());
+            print_r("Error: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage(), 'message' => 'Google Authentication failed.'], 400);
         }
     }

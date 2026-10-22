@@ -13,7 +13,7 @@
             type: 'GOOGLE_AUTH_SUCCESS',
             code: "{{ $code }}"
         },
-        'http://localhost:3000'
+        '{{ env("FRONTEND_URL") }}'
     );
 
     window.close();
