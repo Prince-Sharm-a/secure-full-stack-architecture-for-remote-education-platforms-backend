@@ -7,6 +7,7 @@ use App\Models\User;
 use Cache;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
+use Log;
 use Str;
 
 class GoogleAuthController extends Controller
@@ -20,11 +21,11 @@ class GoogleAuthController extends Controller
         try{
             $googleUser = Socialite::driver('google')->stateless()->user();
 
-            print_r("Google User Email: " . $googleUser->getEmail());
+            // Log::info("Google User Email: " . $googleUser->getEmail());
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            print_r("User: $user");
+            // Log::info("User: $user");
 
             if(!$user){
                 $user = User::create([
@@ -38,7 +39,7 @@ class GoogleAuthController extends Controller
                 ]);
             }
 
-            print_r("User ID: $user->id");
+            // Log::info("User ID: $user->id");
 
             $token = $user->createToken('api-token')->plainTextToken;
 
@@ -52,7 +53,7 @@ class GoogleAuthController extends Controller
 
             return response()->view('auth.google-success',['code' => $code]);
         } catch (\Exception $e){
-            print_r("Error: " . $e->getMessage());
+            Log::error("Error: " . $e->getMessage());
             return response()->json(['error' => $e->getMessage(), 'message' => 'Google Authentication failed.'], 400);
         }
     }
